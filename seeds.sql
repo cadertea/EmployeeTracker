@@ -59,3 +59,8 @@ WHERE
 SELECT * FROM department;
 SELECT * FROM role;
 SELECT * FROM employee;
+
+-- to add employee into the employee table
+SELECT * FROM employee;
+INSERT INTO employee (first_name ,last_name,manager_id,role_id)
+VALUES("James","Baldwin",null,1);
