@@ -101,7 +101,18 @@ function viewAllRoles() {
             start()
         })
 }
-
+var managers= [],
+function listofmanagers(){
+    connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", function(err, res) {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+          managersArr.push(res[i].first_name);
+        }
+    
+      })
+      return managers;
+    }
+    
 function addEmployee() {
 
     inquirer
@@ -119,62 +130,30 @@ function addEmployee() {
             name: 'manager',
             type: 'list',
             message: "Who is their manager?",
-            choices: [{
-                name: "Tom Starck",
-                value: 2
-
-            }]
+            choices: listofmanagers()
 
         }
-    {
-            name: 'role',
-            type: 'list',
-            message: 'What role would you like them to be promoted to?',
-            choices: [{
-                name: "Lead Engineer",
-                value: 1
-            },
-            {
-                name: "Jr Engineer",
-                value: 2
-
-            },
-            {
-                name: "Sales Lead",
-                value: 3
-
-
-            },
-            {
-                name: "Sales Rep",
-                value: 4
-            },
-            {
-                name: "Lawyer",
-                value: 5
-
-            },
-            {
-                name: "Paralegal",
-                value: 6
-            },
-                // dont forget to add 2 more options
-            ]
-        }
+   
 
         ])
         .then(function (response) {
-            console.log(response)
-            connnection.query("UPDATE employee  SET role_id = ? WHERE id =?;", [response.employee, response.role],
-                function (error, records) {
-                    if (error) throw error
-                    console.table(records)
-                    start()
-                })
+            var roleId = selectRole().indexOf(response.role) + 1
+            var managerId = selectManager().indexOf(response.choice) + 1
+            connection.query("INSERT INTO employee SET ?", 
+            {
+                first_name: val.firstName,
+                last_name: val.lastName,
+                manager_id: managerId,
+                role_id: roleId
+                
+            }, function(err){
+                if (err) throw err
+                console.table(val)
+                start()
+            })
+      
         })
-
-
-}
+      }
 
 function updateEmployee() {
     connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
@@ -228,7 +207,7 @@ function updateEmployee() {
                         name: "Finance Associate",
                         value: 8
                     },
-                        // dont forget to add 2 more options
+                    
                     ]
                 }
 
